@@ -1,46 +1,98 @@
 apiVersion: kueue.x-k8s.io/v1beta1
 kind: ResourceFlavor
 metadata:
-  name: gpu
-# spec:
-#   nodeSelector:
-#     nvidia.com/gpu.product: NVIDIA-A100-SXM4-40GB
+  name: v100-flavor
+spec:
+  tolerations:
+    - key: "nvidia.com/gpu.product"
+      operator: "Equal"
+      value: "Tesla-V100-PCIE-32GB"
+      effect: "NoSchedule"
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ResourceFlavor
+metadata:
+  name: a100-flavor
+spec:
+  tolerations:
+    - key: "nvidia.com/gpu.product"
+      operator: "Equal"
+      value: "NVIDIA-A100-SXM4-40GB"
+      effect: "NoSchedule"
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ResourceFlavor
+metadata:
+  name: h100-flavor
+spec:
+  tolerations:
+    - key: "nvidia.com/gpu.product"
+      operator: "Equal"
+      value: "NVIDIA-H100-80GB-HBM3"
+      effect: "NoSchedule"
 ---
 apiVersion: kueue.x-k8s.io/v1beta1
 kind: ClusterQueue
 metadata:
-  name: gpu-clusterqueue
+  name: v100-clusterqueue
 spec:
-  cohort: gpu-cohort
   namespaceSelector: {}
   resourceGroups:
     - coveredResources: ["nvidia.com/gpu"]
       flavors:
-        - name: "gpu"
+        - name: "v100-flavor"
           resources:
             - name: "nvidia.com/gpu"
-              nominalQuota: 2
+              nominalQuota: 3
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ClusterQueue
+metadata:
+  name: a100-clusterqueue
+spec:
+  namespaceSelector: {}
+  resourceGroups:
+    - coveredResources: ["nvidia.com/gpu"]
+      flavors:
+        - name: "a100-flavor"
+          resources:
+            - name: "nvidia.com/gpu"
+              nominalQuota: 0
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ClusterQueue
+metadata:
+  name: h100-clusterqueue
+spec:
+  namespaceSelector: {}
+  resourceGroups:
+    - coveredResources: ["nvidia.com/gpu"]
+      flavors:
+        - name: "h100-flavor"
+          resources:
+            - name: "nvidia.com/gpu"
+              nominalQuota: 0
 ---
 apiVersion: kueue.x-k8s.io/v1beta1
 kind: LocalQueue
 metadata:
-  name: gpu-localqueue
-  namespace: danni-test-94a7cb
+  name: v100-localqueue
+  namespace: ja-ope-test
 spec:
-  clusterQueue: gpu-clusterqueue
+  clusterQueue: v100-clusterqueue
 ---
 apiVersion: kueue.x-k8s.io/v1beta1
 kind: LocalQueue
 metadata:
-  name: gpu-localqueue
-  namespace: danni-test-c1d5a1
+  name: a100-localqueue
+  namespace: ja-ope-test
 spec:
-  clusterQueue: gpu-clusterqueue 
+  clusterQueue: a100-clusterqueue 
 ---
 apiVersion: kueue.x-k8s.io/v1beta1
 kind: LocalQueue
 metadata:
-  name: gpu-localqueue
-  namespace: danni-test-c95174
+  name: h100-localqueue
+  namespace: ja-ope-test
 spec:
-  clusterQueue: gpu-clusterqueue 
+  clusterQueue: h100-clusterqueue 

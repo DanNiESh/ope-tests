@@ -1,30 +1,15 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gpu-job
+  name: gpu-job-<random>
   labels:
-    kueue.x-k8s.io/queue-name: gpu-localqueue
+    kueue.x-k8s.io/queue-name: v100-localqueue
     test_name: kueue_test
 spec:
   parallelism: 1
   completions: 1
   template:
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - preference:
-                matchExpressions:
-                  - key: nvidia.com/gpu.present
-                    operator: In
-                    values:
-                      - 'true'
-                  - key: nvidia.com/gpu.product
-                    operator: In
-                    values:
-                      - NVIDIA-A100-SXM4-40GB
-                      - Tesla-V100-PCIE-32GB
-              weight: 1
       restartPolicy: Never
       containers:
         - name: gpu-job-0

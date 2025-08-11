@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dummy-job
+  labels:
+    kueue.x-k8s.io/queue-name: dummy-localqueue
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: dummy-job
+          image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/pytorch:2025.1
+          command: ["/bin/sh", "-c", "echo Hello && sleep 30"]
+          resources:
+            requests:
+              cpu: "1"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
